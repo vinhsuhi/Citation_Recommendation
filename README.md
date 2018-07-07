@@ -5,7 +5,7 @@ Data:
 Open Research Corpus
 
 
-Make sure you have installed following library:
+Make sure you have installed following libraries:
 1. networkx 1.11
 2. gensim
 3. pymongo
