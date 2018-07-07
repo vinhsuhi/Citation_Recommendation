@@ -4,7 +4,7 @@
 *.png
 *.pdf
 tmp/
-*.txt
+# *.txt
 *swp*
 *.sw?
 gcn_back
@@ -113,3 +113,4 @@ raw_data/**
 
 # processed_data
 processed_data/**
+!*.txt
