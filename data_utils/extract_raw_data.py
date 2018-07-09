@@ -1,7 +1,8 @@
 import json
-from library.utils import MongoDB
+from library.utils import MongoDB, Pickle
 import numpy as np
-
+import os
+from copy import deepcopy
 def read_file(path):
 	"""
 	read file s2-corpus-00
@@ -69,6 +70,8 @@ def read_file(path):
 	So we will construct new datas structure to save what we need, the data structure is as below
 	Only papers publicted in 2017 are kept
 	"""
+	if os.path.exists('processed_data/abstract.json'):
+		return 0
 	with open(path, 'r', encoding='utf-8', errors='ignore') as f:
 		papers = MongoDB.get_collection(database_name='OpenCorpus', collection_name='papers')
 		n_papers = papers.count()
@@ -91,7 +94,7 @@ def read_file(path):
 				}
 			except Exception as err:
 				continue
-			if 2016 <= needed_info['year']  and needed_info['id'] != '' and needed_info['title'] != '' and needed_info['abstract'] != ''\
+			if 2014 <= needed_info['year']  and needed_info['id'] != '' and needed_info['title'] != '' and needed_info['abstract'] != ''\
 							and needed_info['authors'] != [] and needed_info['entities'] != []:
 				if needed_info['incitations'] != [] or needed_info['outcitations'] != []:
 					count += 1
@@ -104,7 +107,7 @@ def read_file(path):
 
 	# return data
 
-def create_map(papers):
+def save_pkl(papers):
 	"""
 	input: papers: a collection of papers
 	output: a collection of [ids, incitations, outcitations]
@@ -112,44 +115,61 @@ def create_map(papers):
 			and will be remove from collection.
 	"""
 	maps = MongoDB.get_collection(database_name='OpenCorpus', collection_name='cite_map')
-	if maps.count() > 100:
-		print("Data has already in DB, number of papers is ", maps.count())
-		return maps
+	if maps.count() > 1000:
+		print("data have been already in DB", maps.count())
+	# 	return 0
+	if os.path.exists('processed_data/ids.pkl'):
+		ids = Pickle.load_obj('processed_data/ids')
+	else:
+		ids = []
+		cursor = papers.find(no_cursor_timeout=True)
+		for i, paper in enumerate(cursor):
+			ids.append(paper['id'])
+		cursor.close()
+		Pickle.save_obj(ids, 'processed_data/ids')
 
-	for paper in papers.find():
-		cite_info = {}
-		outcitations = paper['outcitations']
+	if os.path.exists('processed_data/citations.pkl'):
+		citations = Pickle.load_obj('processed_data/citations')
+	else:
+		citations = []
+		for i, id_ in enumerate(ids):
+			paper = papers.find_one({'id': id_})
+			
+			a = [citation for citation in paper['incitations'] if citation not in citations and citation in ids]
+			citations += a
+			b = [citation for citation in paper['outcitations'] if citation not in citations and citation in ids]
+			citations += b
+
+			print(i, len(citations))
+			if len(citations) > 16000:
+				break
+
+		Pickle.save_obj(citations, 'processed_data/citations')
+		print(len(list(set(citations))))
+
+	count = 0
+	for i, id_ in enumerate(citations):
+		paper = papers.find_one({'id': id_})
 		try:
-			filted_outcitations = []
-			for citation in outcitations:
-				cited_paper = papers.find_one({'id': citation})
-				if cited_paper is not None:
-					filted_outcitations.append(cited_paper['id'])
-		except:
-			continue
-		try:	
 			incitations = paper['incitations']
-			filted_incitations = []
-			for citation in incitations:
-				citing_paper = papers.find_one({'id': citation})
-				if citing_paper is not None:
-					filted_incitations.append(citing_paper['id'])
-		except:
+			filt_incitations = [incitations[i] for i in range(len(incitations)) if incitations[i] in ids]
+			
+			outcitations = paper['outcitations']
+			filt_outcitations = [outcitations[i] for i in range(len(outcitations)) if outcitations[i] in ids]
+		except Exception as err:
+			print(err)
 			continue
-		# remove papers that don't have link to any paper
-		try:
-			if filted_incitations != [] or filted_outcitations != []:
-				cite_info['id'] = paper['id']
-				cite_info['outcitations'] = filted_outcitations
-				cite_info['incitations'] = filted_incitations
-				print(cite_info)
-				MongoDB.insert_documents(database_name='OpenCorpus', collection_name='cite_map', doc=cite_info)
-		except:
-			continue	
-	return maps
+		if filt_outcitations != [] or filt_incitations != []:
+			cite = {'id': id_, 'incitations': filt_incitations, 'outcitations': filt_outcitations}
+			count += 1
+			print(count, i)
+			print(cite)
+			MongoDB.insert_documents(database_name='OpenCorpus', collection_name='cite_map', doc=cite)
+
+
 
 
 if __name__ == "__main__":
 	path = "raw_data/s2-corpus-00"
 	papers = read_file(path)
-	create_map(papers)
+	save_pkl(papers)
