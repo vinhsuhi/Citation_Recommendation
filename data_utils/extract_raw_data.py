@@ -152,19 +152,19 @@ def save_pkl(papers):
 		paper = papers.find_one({'id': id_})
 		try:
 			incitations = paper['incitations']
-			filt_incitations = [incitations[i] for i in range(len(incitations)) if incitations[i] in ids]
+			filt_incitations = [incitations[i] for i in range(len(incitations)) if incitations[i] in citations]
 			
 			outcitations = paper['outcitations']
-			filt_outcitations = [outcitations[i] for i in range(len(outcitations)) if outcitations[i] in ids]
+			filt_outcitations = [outcitations[i] for i in range(len(outcitations)) if outcitations[i] in citations]
 		except Exception as err:
 			print(err)
 			continue
-		if filt_outcitations != [] or filt_incitations != []:
-			cite = {'id': id_, 'incitations': filt_incitations, 'outcitations': filt_outcitations}
-			count += 1
-			print(count, i)
-			print(cite)
-			MongoDB.insert_documents(database_name='OpenCorpus', collection_name='cite_map', doc=cite)
+			
+		cite = {'id': id_, 'incitations': filt_incitations, 'outcitations': filt_outcitations}
+		count += 1
+		print(count, i)
+		print(cite)
+		MongoDB.insert_documents(database_name='OpenCorpus', collection_name='cite_map', doc=cite)
 
 
 
