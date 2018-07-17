@@ -14,3 +14,7 @@ Open Research Corpus
 ### Run
 
 `bash read_data.sh`
+
+### MongoDB
+
+`mongo -u admin -p admin123 --authenticationDatabase admin`
