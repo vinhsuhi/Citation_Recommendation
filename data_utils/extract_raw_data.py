@@ -1,5 +1,6 @@
 import json
-from library.utils import MongoDB, Pickle
+from library.utils import MongoDB, Pickle # Use this if you fun file as Vinh,
+# from utils import MongoDB, Pickle       # or use this if you prefer Thu's way.
 import numpy as np
 import os
 from copy import deepcopy
