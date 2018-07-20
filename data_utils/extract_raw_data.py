@@ -75,11 +75,11 @@ def read_file(path):
 		# return 0
 	with open(path, 'r', encoding='utf-8', errors='ignore') as f:
 		papers = MongoDB.get_collection(database_name='OpenCorpus', collection_name='papers')
-		# n_papers = papers.count()
+		n_papers = papers.count()
 		# if n_papers > 30000:
-		# 	print("Data has already in DB, number of papers is: ", n_papers) # 26673
-		# 	return papers
-		count = 0
+			# print("Data has already in DB, number of papers is: ", n_papers) # 26673
+			# return papers
+		count = n_papers
 		for i, line in enumerate(f):
 			paper_info = json.loads(line)
 			try:
@@ -101,7 +101,7 @@ def read_file(path):
 					count += 1
 					MongoDB.insert_documents(database_name='OpenCorpus', collection_name='papers', doc=needed_info)
 					a = np.random.rand(1)
-					if a < 0.01:
+					if a < 0.001:
 						print(count)
 		print("Number of papers is: ", count)
 		return papers
@@ -175,10 +175,16 @@ def save_pkl(papers):
 
 
 if __name__ == "__main__":
-	path = "raw_data/s2-corpus-0"
-	for i in range(9):
-		new_path = path + str(i)
-		papers = read_file(new_path)
-	maps = save_pkl(papers)
-	print("done!!!")
-	# new_maps = fill_map(maps)
+	path = "raw_data"
+	# for ele in dirr:
+	dirr = os.listdir(path)	
+	while len(dirr) > 1:
+		for ele in dirr:
+			if not ele.endswith('.txt'):
+				new_path = path + '/' + ele
+				print(new_path)
+				papers = read_file(new_path)
+				os.remove(new_path)
+				break
+		dirr = os.listdir(path)
+

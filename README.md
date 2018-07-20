@@ -18,3 +18,10 @@ Open Research Corpus
 ### MongoDB
 
 `mongo -u admin -p admin123 --authenticationDatabase admin`
+
+
+### Download OpenCorpus
+
+`wget -i https://s3-us-west-2.amazonaws.com/ai2-s2-research-public/open-corpus/manifest.txt`
+
+https://s3-us-west-2.amazonaws.com/ai2-s2-research-public/open-corpus/corpus-2018-05-03/s2-corpus-00.gz
