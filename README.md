@@ -15,6 +15,8 @@ Open Research Corpus
 
 `bash read_data.sh`
 
+or like follow: "python3 data_utils/extract_raw_file.py"
+
 ### MongoDB
 
 `mongo -u admin -p admin123 --authenticationDatabase admin`
