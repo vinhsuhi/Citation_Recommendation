@@ -1,1 +1,1 @@
-just store s2-corpus-00 raw file
+just store s2-corpus-00 -> 06 raw file

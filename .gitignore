@@ -105,8 +105,8 @@ ENV/
 # Rope project settings
 .ropeproject
 
-*.pickle
-*.pkl
+# *.pickle
+# *.pkl
 
 # raw_data
 raw_data/**
