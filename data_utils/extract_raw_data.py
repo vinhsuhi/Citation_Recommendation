@@ -372,7 +372,17 @@ if __name__ == "__main__":
     # save_text_to_file()
     # bad_ids = Pickle.load_obj('processed_data/bad_ids')
     # remove_bad_id_papers(bad_ids)
-    get_keywords()
+    # get_keywords()
+    author2doc = Pickle.load_obj('data/key2doc')
+    count = 0
+    # print(author2doc.keys())
+    for keys, values in author2doc.items():
+        if count < 100:
+            print(values)
+        count += len(values)
+        # print(len(values))
+
+    print(count) # 518434
 
 
 
