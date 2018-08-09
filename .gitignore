@@ -114,3 +114,5 @@ raw_data/**
 # processed_data
 processed_data/**
 !*.txt
+
+data/model*
