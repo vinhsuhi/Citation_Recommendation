@@ -34,7 +34,7 @@ def main():
     id2token = {y:x for x,y in token2id.items()}
     model = AuthorTopicModel(corpus=corpus, num_topics=150, id2word=id2token, \
                 author2doc=author2doc, doc2author=doc2author, chunksize=1500, \
-                passes=50, eval_every=0, \
+                passes=50, eval_every=0, alpha='auto', \
                 iterations=200, random_state=1, serialized=True,\
                 serialization_path='data/x.mm')
     print("done inferrence")
